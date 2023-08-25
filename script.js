@@ -1,6 +1,6 @@
 // Use the API_URL variable to make fetch requests to the API.
 // Replace the placeholder with your cohort name (ex: 2109-UNF-HY-WEB-PT)
-const cohortName = "YOUR COHORT NAME HERE";
+const cohortName = "2307-fsa-et-web-sf";
 const API_URL = `https://fsa-puppy-bowl.herokuapp.com/api/${cohortName}`;
 
 /**
@@ -9,11 +9,15 @@ const API_URL = `https://fsa-puppy-bowl.herokuapp.com/api/${cohortName}`;
  */
 const fetchAllPlayers = async () => {
   try {
-    // TODO
+    const response = await fetch(`https://fsa-puppy-bowl.herokuapp.com/api/${cohortName}/players`);
+    const data = await response.json();
+    return data.data.players;
+    // console.log(data.data.players)
   } catch (err) {
     console.error("Uh oh, trouble fetching players!", err);
   }
 };
+// fetchAllPlayers()
 
 /**
  * Fetches a single player from the API.
@@ -22,11 +26,18 @@ const fetchAllPlayers = async () => {
  */
 const fetchSinglePlayer = async (playerId) => {
   try {
-    // TODO
+    const response = await fetch(`${API_URL}/players/${playerId}`);
+  
+    const playerData = await response.json();
+    return playerData.data.player;
+    // console.log(playerData.data.player)
   } catch (err) {
     console.error(`Oh no, trouble fetching player #${playerId}!`, err);
+    return null;
   }
 };
+
+// fetchSinglePlayer(2)
 
 /**
  * Updates `<main>` to display a list of all players.
@@ -48,8 +59,42 @@ const fetchSinglePlayer = async (playerId) => {
  * @param {Object[]} playerList - an array of player objects
  */
 const renderAllPlayers = (playerList) => {
-  // TODO
+  const mainElement = document.querySelector('main');
+  mainElement.innerHTML = "";
+
+  if (!playerList || playerList.length === 0) {
+    mainElement.innerHTML = "<p>No players to display.</p>";
+    return;
+  }
+
+  playerList.forEach(player => {
+    const playerCard = document.createElement('div');
+    playerCard.classList.add('playerCard');
+
+    const playerName = document.createElement('h2');
+    playerName.textContent = player.name;
+    playerCard.appendChild(playerName);
+
+    const playerIdElement = document.createElement('p');
+    playerIdElement.textContent = `ID: ${player.id}`;
+    playerCard.appendChild(playerIdElement);
+
+    const playerImage = document.createElement('img');
+    playerImage.src = player.imageUrl;
+    playerImage.alt = player.name;
+    playerCard.appendChild(playerImage);
+
+    const seeDetailsButton = document.createElement('button');
+    seeDetailsButton.textContent = "See Details";
+    seeDetailsButton.addEventListener('click', () => {
+      renderSinglePlayer(player);
+    });
+    playerCard.appendChild(seeDetailsButton);
+
+    mainElement.appendChild(playerCard);
+  });
 };
+
 
 /**
  * Updates `<main>` to display a single player.
@@ -65,8 +110,45 @@ const renderAllPlayers = (playerList) => {
  * @param {Object} player an object representing a single player
  */
 const renderSinglePlayer = (player) => {
-  // TODO
+  const mainElement = document.querySelector('main');
+  mainElement.innerHTML = "";
+
+  const playerCard = document.createElement('div');
+  playerCard.classList.add('playerCard');
+
+  const playerName = document.createElement('h2');
+  playerName.textContent = player.name;
+  playerCard.appendChild(playerName);
+
+  const playerIdElement = document.createElement('p');
+  playerIdElement.textContent = `ID: ${player.id}`;
+  playerCard.appendChild(playerIdElement);
+
+  const playerBreed = document.createElement('p');
+  playerBreed.textContent = `Breed: ${player.breed}`;
+  playerCard.appendChild(playerBreed);
+
+  const teamName = document.createElement('p');
+  teamName.textContent = `Team: ${player.teamId || "Unassigned"}`;
+  playerCard.appendChild(teamName);
+
+  const playerImage = document.createElement('img');
+  playerImage.src = player.imageUrl;
+  playerImage.alt = player.name;
+  playerCard.appendChild(playerImage);
+
+  const backButton = document.createElement('button');
+  backButton.textContent = "Back to all players";
+  backButton.addEventListener('click', async () => {
+    const players = await fetchAllPlayers();
+    renderAllPlayers(players);
+  });
+  playerCard.appendChild(backButton);
+
+  mainElement.appendChild(playerCard);
 };
+
+
 
 /**
  * Initializes the app by fetching all players and rendering them to the DOM.
