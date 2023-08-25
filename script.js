@@ -38,7 +38,7 @@ const fetchSinglePlayer = async (playerId) => {
 };
 
 // fetchSinglePlayer(2)
-
+// gfg
 /**
  * Updates `<main>` to display a list of all players.
  *
